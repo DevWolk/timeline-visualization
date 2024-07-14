@@ -152,6 +152,18 @@
             border-radius: 50%;
         }
 
+        .ongoing-legend-color {
+            background-color: var(--ongoing-bg);
+        }
+
+        .finished-legend-color {
+            background-color: var(--finished-bg);
+        }
+
+        .reform-legend-color {
+            background-color: var(--reform-bg);
+        }
+
         select {
             padding: 8px 15px;
             border-radius: 5px;
@@ -369,15 +381,15 @@
 </div>
 <div id="legend">
     <div class="legend-item">
-        <div class="legend-color" style="background-color: #FFE0B2;"></div>
+        <div class="legend-color ongoing-legend-color"></div>
         <span id="ongoingLegend"></span>
     </div>
     <div class="legend-item">
-        <div class="legend-color" style="background-color: #A5D6A7;"></div>
+        <div class="legend-color finished-legend-color"></div>
         <span id="finishedLegend"></span>
     </div>
     <div class="legend-item">
-        <div class="legend-color" style="background-color: #E1BEE7;"></div>
+        <div class="legend-color reform-legend-color"></div>
         <span id="reformLegend"></span>
     </div>
 </div>
