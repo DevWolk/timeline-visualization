@@ -9,21 +9,22 @@
     <style>
         :root {
             --bg-color: #f0f0f0;
-            --bg-vis-color: white;
-            --text-color: #333;
-            --text-input-color: white;
-            --item-bg: #D5DDF6;
-            --item-border: #DDD;
-            --item-vis-border: #97B0F8;
-            --finished-bg: #A5D6A7;
-            --finished-border: #4CAF50;
-            --ongoing-bg: #FFE0B2;
-            --ongoing-border: #FFA726;
-            --reform-bg: #E1BEE7;
-            --reform-border: #9C27B0;
-            --control-bg: #4CAF50;
+            --bg-vis-color: #ffffff;
+            --text-color: #333333;
+            --text-input-color: #ffffff;
+            --item-bg: #d5ddf6;
+            --item-border: #cccccc;
+            --item-vis-border: #97b0f8;
+            --finished-bg: #a5d6a7;
+            --finished-border: #4caf50;
+            --ongoing-bg: #ffe0b2;
+            --ongoing-border: #ffa726;
+            --reform-bg: #e1bee7;
+            --reform-border: #9c27b0;
+            --control-bg: #4caf50;
             --control-hover: #45a049;
             --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
         }
 
         body {
@@ -32,7 +33,8 @@
             padding: 20px;
             background-color: var(--bg-color);
             color: var(--text-color);
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            line-height: 1.6;
         }
 
         #visualization {
@@ -43,7 +45,7 @@
             box-shadow: var(--box-shadow);
             border-radius: 8px;
             overflow: hidden;
-            transition: background-color 0.3s ease;
+            transition: background-color var(--transition-speed) ease;
         }
 
         .vis-item {
@@ -51,7 +53,7 @@
             background-color: var(--item-bg);
             border-radius: 5px;
             font-size: 12px;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
+            transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
         }
 
         .vis-item.finished {
@@ -70,17 +72,14 @@
         }
 
         .vis-item .vis-item-content {
+            padding: 5px 8px;
             cursor: pointer;
         }
 
-        .vis-time-axis .vis-text {
-            color: var(--text-color);
-            transition: color 0.3s ease;
-        }
-
+        .vis-time-axis .vis-text,
         .vis-labelset .vis-label {
             color: var(--text-color);
-            transition: color 0.3s ease;
+            transition: color var(--transition-speed) ease;
         }
 
         #eventInfo {
@@ -96,7 +95,7 @@
             overflow-y: auto;
             z-index: 1000;
             box-shadow: var(--box-shadow);
-            transition: opacity 0.3s, transform 0.3s, background-color 0.3s ease;
+            transition: opacity var(--transition-speed), transform var(--transition-speed), background-color var(--transition-speed) ease;
         }
 
         #eventInfo h3 {
@@ -142,7 +141,7 @@
             padding: 5px 10px;
             border-radius: 20px;
             box-shadow: var(--box-shadow);
-            transition: background-color 0.3s ease;
+            transition: background-color var(--transition-speed) ease;
         }
 
         .legend-color {
@@ -164,23 +163,28 @@
             background-color: var(--reform-bg);
         }
 
-        select {
+        select, #searchInput {
             padding: 8px 15px;
             border-radius: 5px;
             border: 1px solid var(--item-border);
             font-size: 14px;
             background-color: var(--bg-vis-color);
             color: var(--text-color);
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+        }
+
+        select:focus, #searchInput:focus {
+            outline: none;
+            border-color: var(--control-bg);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
         }
 
         .controls {
             display: flex;
             justify-content: center;
-            margin-top: 10px;
+            margin: 10px 0;
             flex-wrap: wrap;
             gap: 10px;
-            margin-bottom: 10px;
         }
 
         .controls button {
@@ -191,24 +195,10 @@
             cursor: pointer;
             border-radius: 5px;
             font-size: 14px;
-            transition: background-color 0.3s;
+            transition: background-color var(--transition-speed);
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        #searchInput {
-            padding: 8px 15px;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--item-border);
-            background-color: var(--bg-vis-color);
-            color: var(--text-color);
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
 
         .controls button:hover {
@@ -230,7 +220,7 @@
             padding: 10px;
             border-radius: 50%;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color var(--transition-speed) ease;
             font-size: 20px;
         }
 
@@ -257,22 +247,22 @@
         }
 
         body.dark-theme {
-            --bg-color: #333;
-            --bg-vis-color: #333;
+            --bg-color: #1a1a1a;
+            --bg-vis-color: #2c2c2c;
             --text-color: #f0f0f0;
             --text-input-color: #f0f0f0;
-            --item-bg: #555;
+            --item-bg: #3a3a3a;
             --item-border: #777;
-            --item-vis-border: #97B0F8;
-            --finished-bg: #2E7D32;
-            --finished-border: #1B5E20;
-            --ongoing-bg: #FF8F00;
-            --ongoing-border: #F57C00;
-            --reform-bg: #7B1FA2;
-            --reform-border: #4A148C;
-            --control-bg: #4CAF50;
-            --control-hover: #45a049;
-            --box-shadow: 0 2px 4px rgba(255, 255, 255, 0.35);
+            --item-vis-border: #6a8ed5;
+            --finished-bg: #2e7d32;
+            --finished-border: #1b5e20;
+            --ongoing-bg: #ff8f00;
+            --ongoing-border: #f57c00;
+            --reform-bg: #7b1fa2;
+            --reform-border: #4a148c;
+            --control-bg: #388e3c;
+            --control-hover: #2e7d32;
+            --box-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
@@ -280,12 +270,8 @@
 <div id="languageSelector">
     <label for="language" id="languageLabel"></label>
     <select id="language">
-        <option value="en">
-            English
-        </option>
-        <option value="uk">
-            Українська
-        </option>
+        <option value="en">English</option>
+        <option value="uk">Українська</option>
     </select>
 </div>
 <div id="filters">
@@ -336,7 +322,7 @@
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        Search
+        <span id="searchButtonText"></span>
     </button>
     <button id="resetFilters" aria-label="Reset filters">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -344,7 +330,7 @@
             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
             <path d="M3 3v5h5"></path>
         </svg>
-        Reset Filters
+        <span id="resetFiltersText"></span>
     </button>
     <button id="zoomIn" aria-label="Zoom in">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -354,7 +340,7 @@
             <line x1="11" y1="8" x2="11" y2="14"></line>
             <line x1="8" y1="11" x2="14" y2="11"></line>
         </svg>
-        Zoom In
+        <span id="zoomInText"></span>
     </button>
     <button id="zoomOut" aria-label="Zoom out">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -363,7 +349,7 @@
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             <line x1="8" y1="11" x2="14" y2="11"></line>
         </svg>
-        Zoom Out
+        <span id="zoomOutText"></span>
     </button>
     <button id="exportCSV" aria-label="Export to CSV">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -372,7 +358,7 @@
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
         </svg>
-        Export CSV
+        <span id="exportCSVText"></span>
     </button>
 </div>
 <div id="visualization"></div>
@@ -395,333 +381,320 @@
 </div>
 <button id="themeToggle" aria-label="Toggle theme">🌙</button>
 <script>
-    let translations, itemsData, groupsData, timeline, items, groups;
-    const currentLanguage = 'en';
+    (function () {
+        let translations, itemsData, groupsData, timeline, items, groups;
+        const currentLanguage = 'en';
 
-    async function fetchTimelineData() {
-        try {
-            const response = await fetch('https://gist.githubusercontent.com/DevWolk/2265f9f62ead2282e7d47e653addd94f/raw/6f218aa49eadb59f6ddf6a27f59679f13217852d/data_for_the_timeline.json');
-            if (!response.ok) {
-                console.error('Failed to load data:', response.status, response.statusText);
+        const fetchTimelineData = async () => {
+            try {
+                const response = await fetch('https://gist.githubusercontent.com/DevWolk/2265f9f62ead2282e7d47e653addd94f/raw/9c583d173ad6dcaa6f79a6f66675a1a03a5321aa/data_for_the_timeline.json');
+                if (!response.ok) {
+                    console.error('Failed to load data:', response.status, response.statusText);
+                    return false;
+                }
+                const data = await response.json();
+                ({translations, itemsData, groupsData} = data);
+                return true;
+            } catch (error) {
+                console.error('Error loading data:', error);
                 return false;
-            }
-            const data = await response.json();
-            ({translations, itemsData, groupsData} = data);
-            return true;
-        } catch (error) {
-            console.error('Error loading data:', error);
-            return false;
-        }
-    }
-
-    const saveLanguagePreference = lang => localStorage.setItem('preferredLanguage', lang);
-    const loadLanguagePreference = () => localStorage.getItem('preferredLanguage') || 'en';
-
-    function initializeTimeline() {
-        const container = document.getElementById('visualization');
-        const eventInfo = document.getElementById('eventInfo');
-
-        items = new vis.DataSet(itemsData.map(item => ({
-            ...item,
-            content: item.content[currentLanguage]
-        })));
-
-        groups = new vis.DataSet(groupsData.map(group => ({
-            ...group,
-            content: group.content[currentLanguage]
-        })));
-
-        const options = {
-            stack: true,
-            height: '100%',
-            horizontalScroll: true,
-            verticalScroll: true,
-            zoomKey: 'ctrlKey',
-            start: new Date(2022, 0, 1),
-            end: new Date(),
-            orientation: {
-                axis: 'top',
-                item: 'top'
             }
         };
 
-        timeline = new vis.Timeline(container, items, options);
-        timeline.setGroups(groups);
+        const saveLanguagePreference = lang => localStorage.setItem('preferredLanguage', lang);
+        const loadLanguagePreference = () => localStorage.getItem('preferredLanguage') || 'en';
 
-        timeline.on('click', function (properties) {
-            if (properties.item) {
-                const item = itemsData.find(i => i.id === properties.item);
-                const lang = document.getElementById('language').value;
-                if (item) {
-                    const sourceLinks = item.source.split(',').map(url => {
-                        url = url.trim();
-                        return `<a href="${url}" target="_blank">${new URL(url).hostname}</a>`;
-                    }).join(', ');
+        const initializeTimeline = () => {
+            const container = document.getElementById('visualization');
+            const eventInfo = document.getElementById('eventInfo');
 
-                    eventInfo.innerHTML = `
+            items = new vis.DataSet(itemsData.map(item => ({
+                ...item,
+                content: item.content[currentLanguage]
+            })));
+
+            groups = new vis.DataSet(groupsData.map(group => ({
+                ...group,
+                content: group.content[currentLanguage]
+            })));
+
+            const options = {
+                stack: true,
+                height: '100%',
+                horizontalScroll: true,
+                verticalScroll: true,
+                zoomKey: 'ctrlKey',
+                start: new Date(2022, 0, 1),
+                end: new Date(),
+                orientation: {
+                    axis: 'top',
+                    item: 'top'
+                }
+            };
+
+            timeline = new vis.Timeline(container, items, options);
+            timeline.setGroups(groups);
+
+            timeline.on('click', function (properties) {
+                if (properties.item) {
+                    const item = itemsData.find(i => i.id === properties.item);
+                    const lang = document.getElementById('language').value;
+                    if (item) {
+                        const sourceLinks = item.source.split(',').map(url => {
+                            url = url.trim();
+                            return `<a href="${url}" target="_blank">${new URL(url).hostname}</a>`;
+                        }).join(', ');
+
+                        eventInfo.innerHTML = `
                         <span id="closeEventInfo" aria-label="Close event info">&times;</span>
                         <h3>${item.content[lang]}</h3>
                         <p>${item.description[lang]}</p>
                         <p>${translations[lang].sources}: ${sourceLinks}</p>
                         <p>${translations[lang].date} ${item.type === 'point' ? item.start : item.start + (item.end ? ' - ' + item.end : ' - ' + translations[lang].ongoingStatus.toLowerCase())}</p>
                     `;
-                    showEventInfo();
-                }
-            }
-        });
-
-        function showEventInfo() {
-                    eventInfo.style.display = 'block';
-                    eventInfo.style.opacity = '0';
-                    eventInfo.style.transform = 'translateY(20px)';
-
-                    const rect = eventInfo.getBoundingClientRect();
-                    eventInfo.style.left = `${(window.innerWidth - rect.width) / 2}px`;
-                    eventInfo.style.top = `${(window.innerHeight - rect.height) / 2}px`;
-
-                    setTimeout(() => {
-                        eventInfo.style.opacity = '1';
-                        eventInfo.style.transform = 'translateY(0)';
-                    }, 10);
-
-                    document.getElementById('closeEventInfo').addEventListener('click', closeEventInfoWindow);
-                }
-
-        function closeEventInfoWindow() {
-            eventInfo.style.opacity = '0';
-            eventInfo.style.transform = 'translateY(20px)';
-            setTimeout(() => {
-                eventInfo.style.display = 'none';
-            }, 300);
-        }
-
-        document.addEventListener('click', function (event) {
-            if (!eventInfo.contains(event.target) && !event.target.className.includes('vis-item')) {
-                closeEventInfoWindow();
-            }
-        });
-
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape') {
-                closeEventInfoWindow();
-            }
-        });
-    }
-
-    function updateTimelineData(lang) {
-        items.update(itemsData.map(item => ({
-            ...item,
-            content: item.content[lang]
-        })));
-
-        groups.update(groupsData.map(group => ({
-            ...group,
-            content: group.content[lang]
-        })));
-
-        timeline.redraw();
-    }
-
-    function updateLanguage(lang) {
-        document.title = translations[lang].title;
-        const labels = [
-            'languageLabel', 'eventTypeLabel', 'allEvents', 'scandalEvents',
-            'reformEvents', 'finishedEvents', 'yearLabel', 'allYears',
-            'agencyLabel', 'allAgencies', 'sbuAgency', 'nabuAgency',
-            'bebAgency', 'journalistsAgency', 'opgAgency', 'otherAgency',
-            'statusLabel', 'allStatuses', 'ongoingStatus', 'finishedStatus',
-            'ongoingLegend', 'finishedLegend', 'reformLegend'
-        ];
-
-        labels.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.textContent = translations[lang][id];
-            }
-        });
-
-        document.body.style.opacity = '0';
-        setTimeout(() => {
-            updateTimelineData(lang);
-            applyFilters();
-            document.body.style.opacity = '1';
-        }, 300);
-
-        saveLanguagePreference(lang);
-    }
-
-    function debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func(...args), wait);
-        };
-    }
-
-    const debouncedApplyFilters = debounce(applyFilters, 300);
-
-    function applyFilters() {
-        const lang = document.getElementById('language').value;
-        const filters = ['eventType', 'year', 'agency', 'status'].reduce((acc, id) => {
-            acc[id] = document.getElementById(id).value;
-            return acc;
-        }, {});
-
-        const filteredItems = itemsData.filter(item => {
-            const itemYear = new Date(item.start).getFullYear().toString();
-            return (
-                (filters.eventType === 'all' || (filters.eventType === 'scandal' && item.group !== 7 && item.group !== 8) || (filters.eventType === 'reform' && item.group === 7) || (filters.eventType === 'finished' && item.group === 8)) &&
-                (filters.year === 'all' || itemYear === filters.year) &&
-                (filters.agency === 'all' || item.group.toString() === filters.agency) &&
-                (filters.status === 'all' || (filters.status === 'ongoing' && item.className === 'ongoing') || (filters.status === 'finished' && item.className === 'finished'))
-            );
-        }).map(item => ({
-            ...item,
-            content: item.content[lang]
-        }));
-
-        items.clear();
-        items.add(filteredItems);
-        timeline.setItems(items);
-    }
-
-    function addFilterListeners() {
-        ['eventType', 'year', 'agency', 'status'].forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.addEventListener('change', debouncedApplyFilters);
-            } else {
-                console.warn(`Filter element with id "${id}" not found`);
-            }
-        });
-    }
-
-    function searchEvents() {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        const lang = document.getElementById('language').value;
-
-        const filteredItems = itemsData.filter(item =>
-            item.content[lang].toLowerCase().includes(searchTerm) ||
-            item.description[lang].toLowerCase().includes(searchTerm)
-        ).map(item => ({
-            ...item,
-            content: item.content[lang]
-        }));
-
-        items.clear();
-        items.add(filteredItems);
-        timeline.setItems(items);
-    }
-
-    function resetFilters() {
-        ['eventType', 'year', 'agency', 'status'].forEach(id => {
-            document.getElementById(id).value = 'all';
-        });
-        document.getElementById('searchInput').value = '';
-        applyFilters();
-    }
-
-    function zoomIn() {
-        const currentRange = timeline.getWindow();
-        const newRange = {
-            start: new Date((currentRange.start.getTime() + currentRange.end.getTime()) / 2 - (currentRange.end.getTime() - currentRange.start.getTime()) / 4),
-            end: new Date((currentRange.start.getTime() + currentRange.end.getTime()) / 2 + (currentRange.end.getTime() - currentRange.start.getTime()) / 4)
-        };
-        timeline.setWindow(newRange);
-    }
-
-    function zoomOut() {
-        const currentRange = timeline.getWindow();
-        const newRange = {
-            start: new Date(currentRange.start.getTime() - (currentRange.end.getTime() - currentRange.start.getTime()) / 2),
-            end: new Date(currentRange.end.getTime() + (currentRange.end.getTime() - currentRange.start.getTime()) / 2)
-        };
-        timeline.setWindow(newRange);
-    }
-
-    function exportCSV() {
-        let csv = 'ID,Content,Start,End,Group,Type\n';
-        items.get().forEach(item => {
-            csv += `${item.id},"${item.content}",${item.start},${item.end || ''},${item.group},${item.type}\n`;
-        });
-        const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-        const link = document.createElement("a");
-        if (link.download !== undefined) {
-            const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", "timeline_data.csv");
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    }
-
-    function toggleTheme() {
-        document.body.classList.toggle('dark-theme');
-        const isDarkTheme = document.body.classList.contains('dark-theme');
-        localStorage.setItem('darkTheme', isDarkTheme);
-        updateThemeToggleButton(isDarkTheme);
-    }
-
-    function updateThemeToggleButton(isDarkTheme) {
-        const themeToggle = document.getElementById('themeToggle');
-        themeToggle.textContent = isDarkTheme ? '☀️' : '🌙';
-        themeToggle.setAttribute('aria-label', isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme');
-    }
-
-    function initializeTheme() {
-        const isDarkTheme = localStorage.getItem('darkTheme') === 'true';
-        if (isDarkTheme) {
-            document.body.classList.add('dark-theme');
-        }
-        updateThemeToggleButton(isDarkTheme);
-    }
-
-    async function initializeApp() {
-        try {
-            const dataLoaded = await fetchTimelineData();
-            if (dataLoaded) {
-                initializeTimeline();
-                initializeTheme();
-                const savedLang = loadLanguagePreference();
-                const langSelector = document.getElementById('language');
-                if (langSelector) {
-                    langSelector.value = savedLang;
-                    updateLanguage(savedLang);
-                    langSelector.addEventListener('change', event => {
-                        updateLanguage(event.target.value);
-                    });
-                } else {
-                    console.warn('Language selector not found');
-                }
-
-                addFilterListeners();
-                applyFilters();
-
-                document.getElementById('searchButton').addEventListener('click', searchEvents);
-                document.getElementById('resetFilters').addEventListener('click', resetFilters);
-                document.getElementById('zoomIn').addEventListener('click', zoomIn);
-                document.getElementById('zoomOut').addEventListener('click', zoomOut);
-                document.getElementById('exportCSV').addEventListener('click', exportCSV);
-                document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-
-                document.getElementById('searchInput').addEventListener('keyup', function (event) {
-                    if (event.key === 'Enter') {
-                        searchEvents();
+                        showEventInfo();
                     }
-                });
-            } else {
-                console.error("Failed to load timeline data");
-                document.body.innerHTML = '<p>Failed to load timeline data. Please try refreshing the page.</p>';
-            }
-        } catch (error) {
-            console.error("Failed to initialize the timeline:", error);
-            document.body.innerHTML = '<p>Error initializing the timeline. Please try refreshing the page.</p>';
-        }
-    }
+                }
+            });
 
-    document.addEventListener('DOMContentLoaded', initializeApp);
+            const showEventInfo = () => {
+                eventInfo.style.display = 'block';
+                eventInfo.style.opacity = '0';
+                eventInfo.style.transform = 'translateY(20px)';
+
+                const rect = eventInfo.getBoundingClientRect();
+                eventInfo.style.left = `${(window.innerWidth - rect.width) / 2}px`;
+                eventInfo.style.top = `${(window.innerHeight - rect.height) / 2}px`;
+
+                setTimeout(() => {
+                    eventInfo.style.opacity = '1';
+                    eventInfo.style.transform = 'translateY(0)';
+                }, 10);
+
+                document.getElementById('closeEventInfo').addEventListener('click', closeEventInfoWindow);
+            };
+
+            const closeEventInfoWindow = () => {
+                eventInfo.style.opacity = '0';
+                eventInfo.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    eventInfo.style.display = 'none';
+                }, 300);
+            };
+
+            document.addEventListener('click', function (event) {
+                if (!eventInfo.contains(event.target) && !event.target.className.includes('vis-item')) {
+                    closeEventInfoWindow();
+                }
+            });
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
+                    closeEventInfoWindow();
+                }
+            });
+        };
+
+        const updateTimelineData = (lang) => {
+            items.update(itemsData.map(item => ({
+                ...item,
+                content: item.content[lang]
+            })));
+
+            groups.update(groupsData.map(group => ({
+                ...group,
+                content: group.content[lang]
+            })));
+
+            timeline.redraw();
+        };
+
+        const updateLanguage = (lang) => {
+            document.title = translations[lang].title;
+            const labels = [
+                'languageLabel', 'eventTypeLabel', 'allEvents', 'scandalEvents',
+                'reformEvents', 'finishedEvents', 'yearLabel', 'allYears',
+                'agencyLabel', 'allAgencies', 'sbuAgency', 'nabuAgency',
+                'bebAgency', 'journalistsAgency', 'opgAgency', 'otherAgency',
+                'statusLabel', 'allStatuses', 'ongoingStatus', 'finishedStatus',
+                'ongoingLegend', 'finishedLegend', 'reformLegend', 'searchButtonText',
+                'resetFiltersText', 'zoomInText', 'zoomOutText', 'exportCSVText'
+            ];
+
+            labels.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = translations[lang][id];
+                }
+            });
+
+            document.getElementById('searchInput').placeholder = translations[lang].searchPlaceholder;
+
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                updateTimelineData(lang);
+                applyFilters();
+                document.body.style.opacity = '1';
+            }, 300);
+
+            saveLanguagePreference(lang);
+        };
+
+        const debounce = (func, wait) => {
+            let timeout;
+            return function executedFunction(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func(...args), wait);
+            };
+        };
+
+        const debouncedApplyFilters = debounce(applyFilters, 300);
+
+        function applyFilters() {
+            const lang = document.getElementById('language').value;
+            const filters = ['eventType', 'year', 'agency', 'status'].reduce((acc, id) => {
+                acc[id] = document.getElementById(id).value;
+                return acc;
+            }, {});
+
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            const filteredItems = itemsData.filter(item => {
+                const itemYear = new Date(item.start).getFullYear().toString();
+                return (
+                    (filters.eventType === 'all' || (filters.eventType === 'scandal' && item.group !== 7 && item.group !== 8) || (filters.eventType === 'reform' && item.group === 7) || (filters.eventType === 'finished' && item.group === 8)) &&
+                    (filters.year === 'all' || itemYear === filters.year) &&
+                    (filters.agency === 'all' || item.group.toString() === filters.agency) &&
+                    (filters.status === 'all' || (filters.status === 'ongoing' && item.className === 'ongoing') || (filters.status === 'finished' && item.className === 'finished')) &&
+                    (searchTerm === '' || item.content[lang].toLowerCase().includes(searchTerm) || item.description[lang].toLowerCase().includes(searchTerm))
+                );
+            }).map(item => ({
+                ...item,
+                content: item.content[lang]
+            }));
+
+            items.clear();
+            items.add(filteredItems);
+            timeline.setItems(items);
+        }
+
+        const addFilterListeners = () => {
+            ['eventType', 'year', 'agency', 'status'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('change', debouncedApplyFilters);
+                } else {
+                    console.warn(`Filter element with id "${id}" not found`);
+                }
+            });
+        };
+
+        const resetFilters = () => {
+            ['eventType', 'year', 'agency', 'status'].forEach(id => {
+                document.getElementById(id).value = 'all';
+            });
+            document.getElementById('searchInput').value = '';
+            applyFilters();
+        };
+
+        const zoomIn = () => {
+            const currentRange = timeline.getWindow();
+            const newRange = {
+                start: new Date((currentRange.start.getTime() + currentRange.end.getTime()) / 2 - (currentRange.end.getTime() - currentRange.start.getTime()) / 4),
+                end: new Date((currentRange.start.getTime() + currentRange.end.getTime()) / 2 + (currentRange.end.getTime() - currentRange.start.getTime()) / 4)
+            };
+            timeline.setWindow(newRange);
+        };
+
+        const zoomOut = () => {
+            const currentRange = timeline.getWindow();
+            const newRange = {
+                start: new Date(currentRange.start.getTime() - (currentRange.end.getTime() - currentRange.start.getTime()) / 2),
+                end: new Date(currentRange.end.getTime() + (currentRange.end.getTime() - currentRange.start.getTime()) / 2)
+            };
+            timeline.setWindow(newRange);
+        };
+
+        const exportCSV = () => {
+            let csv = 'ID,Content,Start,End,Group,Type\n';
+            items.get().forEach(item => {
+                csv += `${item.id},"${item.content}",${item.start},${item.end || ''},${item.group},${item.type}\n`;
+            });
+            const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", "timeline_data.csv");
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        };
+
+        const toggleTheme = () => {
+            document.body.classList.toggle('dark-theme');
+            const isDarkTheme = document.body.classList.contains('dark-theme');
+            localStorage.setItem('darkTheme', isDarkTheme);
+            updateThemeToggleButton(isDarkTheme);
+        };
+
+        const updateThemeToggleButton = (isDarkTheme) => {
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.textContent = isDarkTheme ? '☀️' : '🌙';
+            themeToggle.setAttribute('aria-label', isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme');
+        };
+
+        const initializeTheme = () => {
+            const isDarkTheme = localStorage.getItem('darkTheme') === 'true';
+            if (isDarkTheme) {
+                document.body.classList.add('dark-theme');
+            }
+            updateThemeToggleButton(isDarkTheme);
+        };
+
+        const initializeApp = async () => {
+            try {
+                const dataLoaded = await fetchTimelineData();
+                if (dataLoaded) {
+                    initializeTimeline();
+                    initializeTheme();
+                    const savedLang = loadLanguagePreference();
+                    const langSelector = document.getElementById('language');
+                    if (langSelector) {
+                        langSelector.value = savedLang;
+                        updateLanguage(savedLang);
+                        langSelector.addEventListener('change', event => {
+                            updateLanguage(event.target.value);
+                        });
+                    } else {
+                        console.warn('Language selector not found');
+                    }
+
+                    addFilterListeners();
+                    applyFilters();
+
+                    document.getElementById('searchButton').addEventListener('click', applyFilters);
+                    document.getElementById('resetFilters').addEventListener('click', resetFilters);
+                    document.getElementById('zoomIn').addEventListener('click', zoomIn);
+                    document.getElementById('zoomOut').addEventListener('click', zoomOut);
+                    document.getElementById('exportCSV').addEventListener('click', exportCSV);
+                    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+                    document.getElementById('searchInput').addEventListener('input', debouncedApplyFilters);
+                } else {
+                    console.error("Failed to load timeline data");
+                    document.body.innerHTML = '<p>Failed to load timeline data. Please try refreshing the page.</p>';
+                }
+            } catch (error) {
+                console.error("Failed to initialize the timeline:", error);
+                document.body.innerHTML = '<p>Error initializing the timeline. Please try refreshing the page.</p>';
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    })();
 </script>
 </body>
 </html>
