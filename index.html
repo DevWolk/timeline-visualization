@@ -11,6 +11,7 @@
             --bg-color: #f0f0f0;
             --bg-vis-color: white;
             --text-color: #333;
+            --text-input-color: white;
             --item-bg: #D5DDF6;
             --item-border: #DDD;
             --item-vis-border: #97B0F8;
@@ -151,7 +152,7 @@
             border-radius: 50%;
         }
 
-        select, #searchInput {
+        select {
             padding: 8px 15px;
             border-radius: 5px;
             border: 1px solid var(--item-border);
@@ -170,11 +171,11 @@
             margin-bottom: 10px;
         }
 
-        .controls button, #searchInput {
+        .controls button {
             padding: 8px 15px;
             border: none;
             background-color: var(--control-bg);
-            color: white;
+            color: var(--text-input-color);
             cursor: pointer;
             border-radius: 5px;
             font-size: 14px;
@@ -184,18 +185,26 @@
             justify-content: center;
         }
 
+        #searchInput {
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--item-border);
+            background-color: var(--bg-vis-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
         .controls button:hover {
             background-color: var(--control-hover);
         }
 
         .controls button svg {
             margin-right: 5px;
-        }
-
-        #searchInput {
-            background-color: var(--bg-vis-color);
-            color: var(--text-color);
-            border: 1px solid var(--item-border);
         }
 
         #themeToggle {
@@ -239,6 +248,7 @@
             --bg-color: #333;
             --bg-vis-color: #333;
             --text-color: #f0f0f0;
+            --text-input-color: #f0f0f0;
             --item-bg: #555;
             --item-border: #777;
             --item-vis-border: #97B0F8;
@@ -258,8 +268,12 @@
 <div id="languageSelector">
     <label for="language" id="languageLabel"></label>
     <select id="language">
-        <option value="en">English</option>
-        <option value="uk">Українська</option>
+        <option value="en">
+            English
+        </option>
+        <option value="uk">
+            Українська
+        </option>
     </select>
 </div>
 <div id="filters">
@@ -370,7 +384,7 @@
 <button id="themeToggle" aria-label="Toggle theme">🌙</button>
 <script>
     let translations, itemsData, groupsData, timeline, items, groups;
-    let currentLanguage = 'en';
+    const currentLanguage = 'en';
 
     async function fetchTimelineData() {
         try {
@@ -395,23 +409,15 @@
         const container = document.getElementById('visualization');
         const eventInfo = document.getElementById('eventInfo');
 
-        const preparedItems = itemsData.map(item => ({
-            id: item.id,
-            content: item.content[currentLanguage],
-            start: item.start,
-            end: item.end,
-            group: item.group,
-            className: item.className,
-            type: item.type
-        }));
+        items = new vis.DataSet(itemsData.map(item => ({
+            ...item,
+            content: item.content[currentLanguage]
+        })));
 
-        const preparedGroups = groupsData.map(group => ({
-            id: group.id,
+        groups = new vis.DataSet(groupsData.map(group => ({
+            ...group,
             content: group.content[currentLanguage]
-        }));
-
-        items = new vis.DataSet(preparedItems);
-        groups = new vis.DataSet(preparedGroups);
+        })));
 
         const options = {
             stack: true,
@@ -447,6 +453,12 @@
                         <p>${translations[lang].sources}: ${sourceLinks}</p>
                         <p>${translations[lang].date} ${item.type === 'point' ? item.start : item.start + (item.end ? ' - ' + item.end : ' - ' + translations[lang].ongoingStatus.toLowerCase())}</p>
                     `;
+                    showEventInfo();
+                }
+            }
+        });
+
+        function showEventInfo() {
                     eventInfo.style.display = 'block';
                     eventInfo.style.opacity = '0';
                     eventInfo.style.transform = 'translateY(20px)';
@@ -462,8 +474,6 @@
 
                     document.getElementById('closeEventInfo').addEventListener('click', closeEventInfoWindow);
                 }
-            }
-        });
 
         function closeEventInfoWindow() {
             eventInfo.style.opacity = '0';
@@ -488,15 +498,12 @@
 
     function updateTimelineData(lang) {
         items.update(itemsData.map(item => ({
-            id: item.id,
-            content: item.content[lang],
-            start: item.start,
-            end: item.end,
-            className: item.className
+            ...item,
+            content: item.content[lang]
         })));
 
         groups.update(groupsData.map(group => ({
-            id: group.id,
+            ...group,
             content: group.content[lang]
         })));
 
@@ -534,12 +541,8 @@
     function debounce(func, wait) {
         let timeout;
         return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
             clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
+            timeout = setTimeout(() => func(...args), wait);
         };
     }
 
@@ -547,29 +550,23 @@
 
     function applyFilters() {
         const lang = document.getElementById('language').value;
-        const eventType = document.getElementById('eventType').value;
-        const year = document.getElementById('year').value;
-        const agency = document.getElementById('agency').value;
-        const status = document.getElementById('status').value;
-
-        const filteredItems = itemsData.reduce((acc, item) => {
-            const itemYear = new Date(item.start).getFullYear().toString();
-            if ((eventType === 'all' || (eventType === 'scandal' && item.group !== 7 && item.group !== 8) || (eventType === 'reform' && item.group === 7) || (eventType === 'finished' && item.group === 8)) &&
-                (year === 'all' || itemYear === year) &&
-                (agency === 'all' || item.group.toString() === agency) &&
-                (status === 'all' || (status === 'ongoing' && item.className === 'ongoing') || (status === 'finished' && item.className === 'finished'))) {
-                acc.push({
-                    id: item.id,
-                    content: item.content[lang],
-                    start: item.start,
-                    end: item.end,
-                    group: item.group,
-                    className: item.className,
-                    type: item.type
-                });
-            }
+        const filters = ['eventType', 'year', 'agency', 'status'].reduce((acc, id) => {
+            acc[id] = document.getElementById(id).value;
             return acc;
-        }, []);
+        }, {});
+
+        const filteredItems = itemsData.filter(item => {
+            const itemYear = new Date(item.start).getFullYear().toString();
+            return (
+                (filters.eventType === 'all' || (filters.eventType === 'scandal' && item.group !== 7 && item.group !== 8) || (filters.eventType === 'reform' && item.group === 7) || (filters.eventType === 'finished' && item.group === 8)) &&
+                (filters.year === 'all' || itemYear === filters.year) &&
+                (filters.agency === 'all' || item.group.toString() === filters.agency) &&
+                (filters.status === 'all' || (filters.status === 'ongoing' && item.className === 'ongoing') || (filters.status === 'finished' && item.className === 'finished'))
+            );
+        }).map(item => ({
+            ...item,
+            content: item.content[lang]
+        }));
 
         items.clear();
         items.add(filteredItems);
@@ -577,8 +574,7 @@
     }
 
     function addFilterListeners() {
-        const filterIds = ['eventType', 'year', 'agency', 'status'];
-        filterIds.forEach(id => {
+        ['eventType', 'year', 'agency', 'status'].forEach(id => {
             const element = document.getElementById(id);
             if (element) {
                 element.addEventListener('change', debouncedApplyFilters);
@@ -595,32 +591,20 @@
         const filteredItems = itemsData.filter(item =>
             item.content[lang].toLowerCase().includes(searchTerm) ||
             item.description[lang].toLowerCase().includes(searchTerm)
-        );
-
-        updateTimelineWithFilteredItems(filteredItems, lang);
-    }
-
-    function updateTimelineWithFilteredItems(filteredItems, lang) {
-        const updatedItems = filteredItems.map(item => ({
-            id: item.id,
-            content: item.content[lang],
-            start: item.start,
-            end: item.end,
-            group: item.group,
-            className: item.className,
-            type: item.type
+        ).map(item => ({
+            ...item,
+            content: item.content[lang]
         }));
 
         items.clear();
-        items.add(updatedItems);
+        items.add(filteredItems);
         timeline.setItems(items);
     }
 
     function resetFilters() {
-        document.getElementById('eventType').value = 'all';
-        document.getElementById('year').value = 'all';
-        document.getElementById('agency').value = 'all';
-        document.getElementById('status').value = 'all';
+        ['eventType', 'year', 'agency', 'status'].forEach(id => {
+            document.getElementById(id).value = 'all';
+        });
         document.getElementById('searchInput').value = '';
         applyFilters();
     }
