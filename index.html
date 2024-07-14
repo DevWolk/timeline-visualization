@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet"/>
+    <style>
+        :root {
+            --bg-color: #f0f0f0;
+            --bg-vis-color: white;
+            --text-color: #333;
+            --item-bg: #D5DDF6;
+            --item-border: #DDD;
+            --item-vis-border: #97B0F8;
+            --finished-bg: #A5D6A7;
+            --finished-border: #4CAF50;
+            --ongoing-bg: #FFE0B2;
+            --ongoing-border: #FFA726;
+            --reform-bg: #E1BEE7;
+            --reform-border: #9C27B0;
+            --control-bg: #4CAF50;
+            --control-hover: #45a049;
+            --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        #visualization {
+            width: 100%;
+            height: 550px;
+            border: 1px solid var(--item-border);
+            background-color: var(--bg-vis-color);
+            box-shadow: var(--box-shadow);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        .vis-item {
+            border-color: var(--item-border);
+            background-color: var(--item-bg);
+            border-radius: 5px;
+            font-size: 12px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .vis-item.finished {
+            background-color: var(--finished-bg);
+            border-color: var(--finished-border);
+        }
+
+        .vis-item.ongoing {
+            background-color: var(--ongoing-bg);
+            border-color: var(--ongoing-border);
+        }
+
+        .vis-item.reform {
+            background-color: var(--reform-bg);
+            border-color: var(--reform-border);
+        }
+
+        .vis-item .vis-item-content {
+            cursor: pointer;
+        }
+
+        .vis-time-axis .vis-text {
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+
+        .vis-labelset .vis-label {
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+
+        #eventInfo {
+            position: fixed;
+            display: none;
+            background-color: var(--bg-vis-color);
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 14px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: var(--box-shadow);
+            transition: opacity 0.3s, transform 0.3s, background-color 0.3s ease;
+        }
+
+        #eventInfo h3 {
+            margin-top: 0;
+            color: var(--text-color);
+        }
+
+        #eventInfo p {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        #eventInfo a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        #eventInfo a:hover {
+            text-decoration: underline;
+        }
+
+        #closeEventInfo {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-color);
+        }
+
+        #legend, #filters, #languageSelector, .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .legend-item, .filter-item {
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-vis-color);
+            padding: 5px 10px;
+            border-radius: 20px;
+            box-shadow: var(--box-shadow);
+            transition: background-color 0.3s ease;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+
+        select, #searchInput {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: 1px solid var(--item-border);
+            font-size: 14px;
+            background-color: var(--bg-vis-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .controls button, #searchInput {
+            padding: 8px 15px;
+            border: none;
+            background-color: var(--control-bg);
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .controls button:hover {
+            background-color: var(--control-hover);
+        }
+
+        .controls button svg {
+            margin-right: 5px;
+        }
+
+        #searchInput {
+            background-color: var(--bg-vis-color);
+            color: var(--text-color);
+            border: 1px solid var(--item-border);
+        }
+
+        #themeToggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            background-color: var(--control-bg);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 20px;
+        }
+
+        #themeToggle:hover {
+            background-color: var(--control-hover);
+        }
+
+        @media (max-width: 600px) {
+            #eventInfo {
+                width: 95%;
+                max-width: none;
+                left: 2.5% !important;
+                right: 2.5% !important;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .controls button, #searchInput {
+                width: 80%;
+            }
+        }
+
+        body.dark-theme {
+            --bg-color: #333;
+            --bg-vis-color: #333;
+            --text-color: #f0f0f0;
+            --item-bg: #555;
+            --item-border: #777;
+            --item-vis-border: #97B0F8;
+            --finished-bg: #2E7D32;
+            --finished-border: #1B5E20;
+            --ongoing-bg: #FF8F00;
+            --ongoing-border: #F57C00;
+            --reform-bg: #7B1FA2;
+            --reform-border: #4A148C;
+            --control-bg: #4CAF50;
+            --control-hover: #45a049;
+            --box-shadow: 0 2px 4px rgba(255, 255, 255, 0.35);
+        }
+    </style>
+</head>
+<body>
+<div id="languageSelector">
+    <label for="language" id="languageLabel"></label>
+    <select id="language">
+        <option value="en">English</option>
+        <option value="uk">Українська</option>
+    </select>
+</div>
+<div id="filters">
+    <div class="filter-item">
+        <label for="eventType" id="eventTypeLabel"></label>
+        <select id="eventType" aria-label="Filter by event type">
+            <option value="all" id="allEvents"></option>
+            <option value="scandal" id="scandalEvents"></option>
+            <option value="reform" id="reformEvents"></option>
+            <option value="finished" id="finishedEvents"></option>
+        </select>
+    </div>
+    <div class="filter-item">
+        <label for="year" id="yearLabel"></label>
+        <select id="year" aria-label="Filter by year">
+            <option value="all" id="allYears"></option>
+            <option value="2022">2022</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+        </select>
+    </div>
+    <div class="filter-item">
+        <label for="agency" id="agencyLabel"></label>
+        <select id="agency" aria-label="Filter by agency">
+            <option value="all" id="allAgencies"></option>
+            <option value="1" id="sbuAgency"></option>
+            <option value="2" id="nabuAgency"></option>
+            <option value="3" id="bebAgency"></option>
+            <option value="4" id="journalistsAgency"></option>
+            <option value="5" id="opgAgency"></option>
+            <option value="6" id="otherAgency"></option>
+        </select>
+    </div>
+    <div class="filter-item">
+        <label for="status" id="statusLabel"></label>
+        <select id="status" aria-label="Filter by status">
+            <option value="all" id="allStatuses"></option>
+            <option value="ongoing" id="ongoingStatus"></option>
+            <option value="finished" id="finishedStatus"></option>
+        </select>
+    </div>
+</div>
+<div class="controls">
+    <input type="text" id="searchInput" placeholder="Search..." aria-label="Search events">
+    <button id="searchButton" aria-label="Search">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        Search
+    </button>
+    <button id="resetFilters" aria-label="Reset filters">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+        </svg>
+        Reset Filters
+    </button>
+    <button id="zoomIn" aria-label="Zoom in">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <line x1="11" y1="8" x2="11" y2="14"></line>
+            <line x1="8" y1="11" x2="14" y2="11"></line>
+        </svg>
+        Zoom In
+    </button>
+    <button id="zoomOut" aria-label="Zoom out">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <line x1="8" y1="11" x2="14" y2="11"></line>
+        </svg>
+        Zoom Out
+    </button>
+    <button id="exportCSV" aria-label="Export to CSV">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Export CSV
+    </button>
+</div>
+<div id="visualization"></div>
+<div id="eventInfo">
+    <span id="closeEventInfo" aria-label="Close event info">&times;</span>
+</div>
+<div id="legend">
+    <div class="legend-item">
+        <div class="legend-color" style="background-color: #FFE0B2;"></div>
+        <span id="ongoingLegend"></span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color" style="background-color: #A5D6A7;"></div>
+        <span id="finishedLegend"></span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color" style="background-color: #E1BEE7;"></div>
+        <span id="reformLegend"></span>
+    </div>
+</div>
+<button id="themeToggle" aria-label="Toggle theme">🌙</button>
+<script>
+    let translations, itemsData, groupsData, timeline, items, groups;
+    let currentLanguage = 'en';
+
+    async function fetchTimelineData() {
+        try {
+            const response = await fetch('https://gist.githubusercontent.com/DevWolk/2265f9f62ead2282e7d47e653addd94f/raw/6f218aa49eadb59f6ddf6a27f59679f13217852d/data_for_the_timeline.json');
+            if (!response.ok) {
+                console.error('Failed to load data:', response.status, response.statusText);
+                return false;
+            }
+            const data = await response.json();
+            ({translations, itemsData, groupsData} = data);
+            return true;
+        } catch (error) {
+            console.error('Error loading data:', error);
+            return false;
+        }
+    }
+
+    const saveLanguagePreference = lang => localStorage.setItem('preferredLanguage', lang);
+    const loadLanguagePreference = () => localStorage.getItem('preferredLanguage') || 'en';
+
+    function initializeTimeline() {
+        const container = document.getElementById('visualization');
+        const eventInfo = document.getElementById('eventInfo');
+
+        const preparedItems = itemsData.map(item => ({
+            id: item.id,
+            content: item.content[currentLanguage],
+            start: item.start,
+            end: item.end,
+            group: item.group,
+            className: item.className,
+            type: item.type
+        }));
+
+        const preparedGroups = groupsData.map(group => ({
+            id: group.id,
+            content: group.content[currentLanguage]
+        }));
+
+        items = new vis.DataSet(preparedItems);
+        groups = new vis.DataSet(preparedGroups);
+
+        const options = {
+            stack: true,
+            height: '100%',
+            horizontalScroll: true,
+            verticalScroll: true,
+            zoomKey: 'ctrlKey',
+            start: new Date(2022, 0, 1),
+            end: new Date(),
+            orientation: {
+                axis: 'top',
+                item: 'top'
+            }
+        };
+
+        timeline = new vis.Timeline(container, items, options);
+        timeline.setGroups(groups);
+
+        timeline.on('click', function (properties) {
+            if (properties.item) {
+                const item = itemsData.find(i => i.id === properties.item);
+                const lang = document.getElementById('language').value;
+                if (item) {
+                    const sourceLinks = item.source.split(',').map(url => {
+                        url = url.trim();
+                        return `<a href="${url}" target="_blank">${new URL(url).hostname}</a>`;
+                    }).join(', ');
+
+                    eventInfo.innerHTML = `
+                        <span id="closeEventInfo" aria-label="Close event info">&times;</span>
+                        <h3>${item.content[lang]}</h3>
+                        <p>${item.description[lang]}</p>
+                        <p>${translations[lang].sources}: ${sourceLinks}</p>
+                        <p>${translations[lang].date} ${item.type === 'point' ? item.start : item.start + (item.end ? ' - ' + item.end : ' - ' + translations[lang].ongoingStatus.toLowerCase())}</p>
+                    `;
+                    eventInfo.style.display = 'block';
+                    eventInfo.style.opacity = '0';
+                    eventInfo.style.transform = 'translateY(20px)';
+
+                    const rect = eventInfo.getBoundingClientRect();
+                    eventInfo.style.left = `${(window.innerWidth - rect.width) / 2}px`;
+                    eventInfo.style.top = `${(window.innerHeight - rect.height) / 2}px`;
+
+                    setTimeout(() => {
+                        eventInfo.style.opacity = '1';
+                        eventInfo.style.transform = 'translateY(0)';
+                    }, 10);
+
+                    document.getElementById('closeEventInfo').addEventListener('click', closeEventInfoWindow);
+                }
+            }
+        });
+
+        function closeEventInfoWindow() {
+            eventInfo.style.opacity = '0';
+            eventInfo.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                eventInfo.style.display = 'none';
+            }, 300);
+        }
+
+        document.addEventListener('click', function (event) {
+            if (!eventInfo.contains(event.target) && !event.target.className.includes('vis-item')) {
+                closeEventInfoWindow();
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeEventInfoWindow();
+            }
+        });
+    }
+
+    function updateTimelineData(lang) {
+        items.update(itemsData.map(item => ({
+            id: item.id,
+            content: item.content[lang],
+            start: item.start,
+            end: item.end,
+            className: item.className
+        })));
+
+        groups.update(groupsData.map(group => ({
+            id: group.id,
+            content: group.content[lang]
+        })));
+
+        timeline.redraw();
+    }
+
+    function updateLanguage(lang) {
+        document.title = translations[lang].title;
+        const labels = [
+            'languageLabel', 'eventTypeLabel', 'allEvents', 'scandalEvents',
+            'reformEvents', 'finishedEvents', 'yearLabel', 'allYears',
+            'agencyLabel', 'allAgencies', 'sbuAgency', 'nabuAgency',
+            'bebAgency', 'journalistsAgency', 'opgAgency', 'otherAgency',
+            'statusLabel', 'allStatuses', 'ongoingStatus', 'finishedStatus',
+            'ongoingLegend', 'finishedLegend', 'reformLegend'
+        ];
+
+        labels.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = translations[lang][id];
+            }
+        });
+
+        document.body.style.opacity = '0';
+        setTimeout(() => {
+            updateTimelineData(lang);
+            applyFilters();
+            document.body.style.opacity = '1';
+        }, 300);
+
+        saveLanguagePreference(lang);
+    }
+
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    const debouncedApplyFilters = debounce(applyFilters, 300);
+
+    function applyFilters() {
+        const lang = document.getElementById('language').value;
+        const eventType = document.getElementById('eventType').value;
+        const year = document.getElementById('year').value;
+        const agency = document.getElementById('agency').value;
+        const status = document.getElementById('status').value;
+
+        const filteredItems = itemsData.reduce((acc, item) => {
+            const itemYear = new Date(item.start).getFullYear().toString();
+            if ((eventType === 'all' || (eventType === 'scandal' && item.group !== 7 && item.group !== 8) || (eventType === 'reform' && item.group === 7) || (eventType === 'finished' && item.group === 8)) &&
+                (year === 'all' || itemYear === year) &&
+                (agency === 'all' || item.group.toString() === agency) &&
+                (status === 'all' || (status === 'ongoing' && item.className === 'ongoing') || (status === 'finished' && item.className === 'finished'))) {
+                acc.push({
+                    id: item.id,
+                    content: item.content[lang],
+                    start: item.start,
+                    end: item.end,
+                    group: item.group,
+                    className: item.className,
+                    type: item.type
+                });
+            }
+            return acc;
+        }, []);
+
+        items.clear();
+        items.add(filteredItems);
+        timeline.setItems(items);
+    }
+
+    function addFilterListeners() {
+        const filterIds = ['eventType', 'year', 'agency', 'status'];
+        filterIds.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', debouncedApplyFilters);
+            } else {
+                console.warn(`Filter element with id "${id}" not found`);
+            }
+        });
+    }
+
+    function searchEvents() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const lang = document.getElementById('language').value;
+
+        const filteredItems = itemsData.filter(item =>
+            item.content[lang].toLowerCase().includes(searchTerm) ||
+            item.description[lang].toLowerCase().includes(searchTerm)
+        );
+
+        updateTimelineWithFilteredItems(filteredItems, lang);
+    }
+
+    function updateTimelineWithFilteredItems(filteredItems, lang) {
+        const updatedItems = filteredItems.map(item => ({
+            id: item.id,
+            content: item.content[lang],
+            start: item.start,
+            end: item.end,
+            group: item.group,
+            className: item.className,
+            type: item.type
+        }));
+
+        items.clear();
+        items.add(updatedItems);
+        timeline.setItems(items);
+    }
+
+    function resetFilters() {
+        document.getElementById('eventType').value = 'all';
+        document.getElementById('year').value = 'all';
+        document.getElementById('agency').value = 'all';
+        document.getElementById('status').value = 'all';
+        document.getElementById('searchInput').value = '';
+        applyFilters();
+    }
+
+    function zoomIn() {
+        const currentRange = timeline.getWindow();
+        const newRange = {
+            start: new Date((currentRange.start.getTime() + currentRange.end.getTime()) / 2 - (currentRange.end.getTime() - currentRange.start.getTime()) / 4),
+            end: new Date((currentRange.start.getTime() + currentRange.end.getTime()) / 2 + (currentRange.end.getTime() - currentRange.start.getTime()) / 4)
+        };
+        timeline.setWindow(newRange);
+    }
+
+    function zoomOut() {
+        const currentRange = timeline.getWindow();
+        const newRange = {
+            start: new Date(currentRange.start.getTime() - (currentRange.end.getTime() - currentRange.start.getTime()) / 2),
+            end: new Date(currentRange.end.getTime() + (currentRange.end.getTime() - currentRange.start.getTime()) / 2)
+        };
+        timeline.setWindow(newRange);
+    }
+
+    function exportCSV() {
+        let csv = 'ID,Content,Start,End,Group,Type\n';
+        items.get().forEach(item => {
+            csv += `${item.id},"${item.content}",${item.start},${item.end || ''},${item.group},${item.type}\n`;
+        });
+        const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+        const link = document.createElement("a");
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "timeline_data.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('dark-theme');
+        const isDarkTheme = document.body.classList.contains('dark-theme');
+        localStorage.setItem('darkTheme', isDarkTheme);
+        updateThemeToggleButton(isDarkTheme);
+    }
+
+    function updateThemeToggleButton(isDarkTheme) {
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.textContent = isDarkTheme ? '☀️' : '🌙';
+        themeToggle.setAttribute('aria-label', isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+
+    function initializeTheme() {
+        const isDarkTheme = localStorage.getItem('darkTheme') === 'true';
+        if (isDarkTheme) {
+            document.body.classList.add('dark-theme');
+        }
+        updateThemeToggleButton(isDarkTheme);
+    }
+
+    async function initializeApp() {
+        try {
+            const dataLoaded = await fetchTimelineData();
+            if (dataLoaded) {
+                initializeTimeline();
+                initializeTheme();
+                const savedLang = loadLanguagePreference();
+                const langSelector = document.getElementById('language');
+                if (langSelector) {
+                    langSelector.value = savedLang;
+                    updateLanguage(savedLang);
+                    langSelector.addEventListener('change', event => {
+                        updateLanguage(event.target.value);
+                    });
+                } else {
+                    console.warn('Language selector not found');
+                }
+
+                addFilterListeners();
+                applyFilters();
+
+                document.getElementById('searchButton').addEventListener('click', searchEvents);
+                document.getElementById('resetFilters').addEventListener('click', resetFilters);
+                document.getElementById('zoomIn').addEventListener('click', zoomIn);
+                document.getElementById('zoomOut').addEventListener('click', zoomOut);
+                document.getElementById('exportCSV').addEventListener('click', exportCSV);
+                document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+                document.getElementById('searchInput').addEventListener('keyup', function (event) {
+                    if (event.key === 'Enter') {
+                        searchEvents();
+                    }
+                });
+            } else {
+                console.error("Failed to load timeline data");
+                document.body.innerHTML = '<p>Failed to load timeline data. Please try refreshing the page.</p>';
+            }
+        } catch (error) {
+            console.error("Failed to initialize the timeline:", error);
+            document.body.innerHTML = '<p>Error initializing the timeline. Please try refreshing the page.</p>';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', initializeApp);
+</script>
+</body>
+</html>
