@@ -545,30 +545,14 @@
             });
 
             document.addEventListener('keydown', handleKeyboardNavigation);
+
+            window.addEventListener('resize', handleResize);
         };
 
         const showEventInfo = () => {
             const eventInfo = document.getElementById('eventInfo');
-            eventInfo.style.display = 'block';
-            eventInfo.style.opacity = '0';
-            eventInfo.style.transform = 'translateY(20px)';
 
-            const isMobile = window.innerWidth <= 600;
-
-            if (isMobile) {
-                eventInfo.style.left = '0';
-                eventInfo.style.right = '0';
-                eventInfo.style.bottom = '0';
-                eventInfo.style.top = 'auto';
-                eventInfo.style.width = '100%';
-                eventInfo.style.maxHeight = '70vh';
-                eventInfo.style.borderRadius = '20px 20px 0 0';
-            } else {
-                const rect = eventInfo.getBoundingClientRect();
-                eventInfo.style.left = `${(window.innerWidth - rect.width) / 2}px`;
-                eventInfo.style.top = `${(window.innerHeight - rect.height) / 2}px`;
-                eventInfo.style.maxHeight = '80vh';
-            }
+            adjustEventInfoPosition();
 
             setTimeout(() => {
                 eventInfo.style.opacity = '1';
@@ -578,6 +562,38 @@
             document.getElementById('closeEventInfo').addEventListener('click', closeEventInfoWindow);
         };
 
+        const adjustEventInfoPosition = () => {
+            const eventInfo = document.getElementById('eventInfo');
+            const isMobile = window.innerWidth <= 600;
+
+            eventInfo.style.display = 'block';
+            eventInfo.style.opacity = '0';
+            eventInfo.style.transform = 'translateY(20px)';
+            eventInfo.style.left = '';
+            eventInfo.style.right = '';
+            eventInfo.style.top = '';
+            eventInfo.style.bottom = '';
+            eventInfo.style.margin = '';
+            eventInfo.style.inset = '';
+
+            if (isMobile) {
+                eventInfo.style.left = '0';
+                eventInfo.style.right = '0';
+                eventInfo.style.bottom = '0';
+                eventInfo.style.top = 'auto';
+                eventInfo.style.margin = 'auto';
+                eventInfo.style.width = '90%';
+                eventInfo.style.maxHeight = '70vh';
+                eventInfo.style.borderRadius = '20px 20px 0 0';
+                eventInfo.style.inset = '';
+            } else {
+                const rect = eventInfo.getBoundingClientRect();
+                eventInfo.style.left = `${(window.innerWidth - rect.width) / 2}px`;
+                eventInfo.style.top = `${(window.innerHeight - rect.height) / 2}px`;
+                eventInfo.style.maxHeight = '80vh';
+            }
+        };
+
         const closeEventInfoWindow = () => {
             const eventInfo = document.getElementById('eventInfo');
             eventInfo.style.opacity = '0';
@@ -585,6 +601,13 @@
             setTimeout(() => {
                 eventInfo.style.display = 'none';
             }, 300);
+        };
+
+        const handleResize = () => {
+            const eventInfo = document.getElementById('eventInfo');
+            if (eventInfo.style.display === 'block') {
+                showEventInfo();
+            }
         };
 
         const handleKeyboardNavigation = (event) => {
@@ -619,7 +642,7 @@
                 'agencyLabel', 'allAgencies', 'sbuAgency', 'nabuAgency',
                 'bebAgency', 'journalistsAgency', 'opgAgency', 'otherAgency',
                 'statusLabel', 'allStatuses', 'ongoingStatus', 'finishedStatus',
-                'ongoingLegend', 'finishedLegend', 'reformLegend','resetFiltersText',
+                'ongoingLegend', 'finishedLegend', 'reformLegend', 'resetFiltersText',
                 'zoomInText', 'zoomOutText', 'exportCSVText', 'toggleHeatmapText'
             ];
 
