@@ -546,6 +546,13 @@
 
             document.addEventListener('keydown', handleKeyboardNavigation);
 
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    searchInput.blur();
+                }
+            });
+
             window.addEventListener('resize', handleResize);
         };
 
