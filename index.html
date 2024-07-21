@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4caf50">
     <title></title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet"/>
-    <link rel="canonical" href="https://devwolk.github.io/timeline-visualization/" />
+    <link rel="canonical" href="https://devwolk.github.io/timeline-visualization/"/>
     <link rel="icon" type="image/x-icon" href="/timeline-visualization/favicon/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="/timeline-visualization/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/timeline-visualization/favicon/favicon-32x32.png">
@@ -467,6 +468,19 @@
     </div>
 </div>
 <button id="themeToggle" aria-label="Toggle theme">🌙</button>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/timeline-visualization/sw.js', {scope: '/timeline-visualization/'})
+                .then(registration => {
+                    console.log('Service Worker registered successfully:', registration.scope);
+                })
+                .catch(error => {
+                    console.log('Service Worker registration failed:', error);
+                });
+        });
+    }
+</script>
 <script>
     (function () {
         let translations, itemsData, groupsData, timeline, items, groups;
